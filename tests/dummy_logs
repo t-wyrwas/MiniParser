@@ -1,0 +1,30 @@
+some random log from some piece of software
+TEST_SIG bin\binmodule1\utils.cpp sum 1: Some message from the system from binary module 1
+some random log from some piece of software
+some random log from some piece of software
+TEST_SIG lib\binmodule1\utils.cpp multiply 2: Some message from the system from library module 1
+TEST_SIG lib\libmodule2\magic.cpp doSomething 3: Some message from the system from library module 2
+some random log from some piece of software
+some random log from some piece of software
+some random log from some piece of software
+TEST_SIG bin\binmodule1 sum 4: Some message from the system from binary module 1
+TEST_SIG lib\libmodule1\magic.cpp doSomethingElse 5: Some message from the system from library module 1
+TEST_SIG lib\libmodule2\magic.cpp doSomethingElse 6: Some message from the system from library module 2
+TEST_SIG bin\binmodule1\stuff.cpp doStuff 7: Some message from the system from binary module 1
+
+TEST_SIG lib\libmodule1\libUtils.cpp sum 8: Some message from the system from library module 1
+TEST_SIG lib\libmodule2\magic.cpp doSomething 9: Some message from the system from library module 2
+TEST_SIG bin\binmodule1\magic.cpp doSomething 10: Some message from the system from binary module 1
+some random log from some piece of software
+some random log from some piece of software
+some random log from some piece of software
+TEST_SIG lib\libmodule1\magic.cpp someAction 11: Some message from the system from library module 1
+TEST_SIG lib\libmodule2\magic.cpp someAction 12: Some message from the system from library module 2
+
+some random log from some piece of software
+some random log from some piece of software
+some random log from some piece of software
+
+some random log from some piece of software
+some random log from some piece of software
+some random log from some piece of software

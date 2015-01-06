@@ -1,0 +1,41 @@
+{"default_path": "C:\\MINIMALIST_PARSER_LOGS",
+
+"size": {"width": 1024, "height": 720},
+
+"parser": {
+
+    "separator": " ",
+
+    "logs_signature": {
+        "value": "TEST_SIG",
+        "position": 0
+    },
+
+    "parts": [
+        {"name": "Modules",
+        "classifications": [
+            {"pattern": "bin\\binmodule1",
+            "class": "BinModule1"},
+            {"pattern": "lib\\libmodule1",
+            "class": "LibModule1"},
+            {"pattern": "lib\\libmodule2",
+            "class": "LibModule2"}
+            ],
+        "filter": 1
+        },
+
+        {"name": "File",
+        "start": 1,
+        "end": 1},
+
+        {"name": "Message",
+        "start": 3,
+        "end": -1,
+        "for_unrelated": 1},
+
+        {"name": "Function",
+        "start": 2,
+        "end": 2}
+    ]
+}
+}
