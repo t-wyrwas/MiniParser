@@ -69,8 +69,6 @@ class KeeperTests(unittest.TestCase):
     def test_get_new_logs(self):
         logs_to_append = ['some random new_log', 'some random new_log1', 'some random new_log2']
         new_logs = self._keeper.get_new_logs()
-        print len(new_logs)
-        print len(self._expected_logs)
         self.assertEqual(len(new_logs), len(self._expected_logs))
         return
         i = 0
@@ -109,7 +107,6 @@ class KeeperTests(unittest.TestCase):
     def test_get_filter_values(self):
         expected_filter = {u'LibModule1': True, u'Unknown': True, u'BinModule1': True, u'LibModule2': True, u'Other': True}
         filter_values = self._keeper.get_filter_values()
-        print filter_values
         self.assertEqual(len(filter_values), len(expected_filter))
 
         filter_keys = filter_values.keys()
