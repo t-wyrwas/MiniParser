@@ -51,6 +51,8 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
         menu_bar = wx.MenuBar()
         # File Menu
         file_menu = wx.Menu()
+        clear_display_item = file_menu.Append(wx.ID_CLEAR, 'Clear display', 'Clear display')
+        file_menu.Bind(wx.EVT_MENU, self._on_clear_display, clear_display_item)
         # Read file
         open_item = file_menu.Append(wx.ID_OPEN, 'Open', 'Open file')
         file_menu.Bind(wx.EVT_MENU, self._on_read, open_item)
@@ -161,7 +163,8 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
 
     def _reset(self):
         self._clear_display()
-        self._model = data.keeper.Keeper(self)
+        self._model.reset()
+        self._update_status_bar()
 
     def _intercept_new_logs(self):
         new_logs = self._model.get_new_logs()
@@ -213,6 +216,9 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
         # self._serial_port_reader.stop() #todo doesn't work
         self._reader.stop()
         self.Destroy()
+
+    def _on_clear_display(self, e):
+        self._reset()
 
     def _on_read(self, e):
         print '_on_read'
