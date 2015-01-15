@@ -47,6 +47,8 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
         self.COLOUR_MARK = wx.Colour(200, 200, 250)
         self.COLOUR_DOUBLE_MARK = wx.Colour(100, 100, 250)
         self.COLOUR_UNMARK = wx.Colour(255, 255, 255)
+        self._INFO_LABELS = dict()
+        self._set_info_labels()
 
         menu_bar = wx.MenuBar()
         # File Menu
@@ -131,7 +133,7 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
         # Frame
         frame_size = logger_configuration.CONFIGURATION['size']
         self.SetSize((frame_size['width'], frame_size['height']))
-        self.SetTitle('Minimalist Parser')
+        self._set_title()
         self.Center()
         self.Show()
 
@@ -154,6 +156,17 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
     def notify_new_logs(self):
         self._intercept_new_logs()
 
+    def _set_title(self, info = ''):
+        whole_title = self._INFO_LABELS['TITLE']
+        if info != '':
+            whole_title += ' - '
+            whole_title += info
+        self.SetTitle(whole_title)
+
+    def _set_info_labels(self):
+        self._INFO_LABELS['TITLE'] = 'MiniParser'
+        self._INFO_LABELS['SERIAL_PORT_READ'] = 'Reading from serial port'
+
     def _clear_display(self):
         self._display.DeleteAllItems()
         self._index = 0
@@ -165,6 +178,7 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
         self._clear_display()
         self._model.reset()
         self._update_status_bar()
+        self._set_title()
 
     def _intercept_new_logs(self):
         new_logs = self._model.get_new_logs()
@@ -237,6 +251,7 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
             self._status_view = str(self._model)
             self._update_status_bar()
             path = dialog.GetPath()
+            self._set_title(path)
             dialog.Destroy()
             self._reader = file_read.DumpFileReader(self.get_model(), path)
             reader_thread = threading.Thread(target=self._reader.run)
@@ -250,9 +265,11 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
         reader_thread = threading.Thread(target=self._serial_port_reader.run)
         print '_on_read_ser_port: starting thread'
         reader_thread.start()
+        self._set_title(self._INFO_LABELS['SERIAL_PORT_READ'])
 
     def _on_stop_ser_port(self, e):
         self._serial_port_reader.stop()
+        self._set_title()
 
     def _on_save(self, e):
         #todo
