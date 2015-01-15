@@ -11,8 +11,8 @@ import ui_utilities.layout_reader
 
 import data.keeper
 
-import file_read
-import serial_port_reader
+import communication.file_read
+import communication.serial_port_reader
 import logger_configuration
 
 
@@ -27,22 +27,22 @@ ID_QUICK_SAVE_FILTERED = 8004
 
 
 #todo make it inherit from general interface to create abstraction layer between wx and the rest of code
-class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
+class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
     """ Serves as the main window for the application with necessary options to control display of parsed dump.
     >>> app = wx.App()
-    >>> wxp = WxPanel(None)
+    >>> wxp = WxMainWindow(None)
     >>> app.MainLoop()
     """
 
     def __init__(self, *args, **kwargs):
-        super(WxPanel, self).__init__(*args, **kwargs)
+        super(WxMainWindow, self).__init__(*args, **kwargs)
 
         self._model = data.keeper.Keeper(self)
         self._logs_to_display = []
         self._prev_log = str()
         self._index = 0
-        self._reader = file_read.DumpFileReader(self._model, '')    #todo refactor
-        self._serial_port_reader = serial_port_reader.SerialPortReader(self._model) # wtf?
+        self._reader = communication.file_read.DumpFileReader(self._model, '')    #todo refactor
+        self._serial_port_reader = communication.serial_port_reader.SerialPortReader(self._model) # wtf?
 
         self.COLOUR_MARK = wx.Colour(200, 200, 250)
         self.COLOUR_DOUBLE_MARK = wx.Colour(100, 100, 250)
@@ -253,7 +253,7 @@ class WxPanel (ui_utilities.base_window.BaseWindow, wx.Frame):
             path = dialog.GetPath()
             self._set_title(path)
             dialog.Destroy()
-            self._reader = file_read.DumpFileReader(self.get_model(), path)
+            self._reader = communication.file_read.DumpFileReader(self.get_model(), path)
             reader_thread = threading.Thread(target=self._reader.run)
             reader_thread.start()
 
