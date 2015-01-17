@@ -88,46 +88,61 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
         self._status_bar = self.CreateStatusBar()
         self._status_view = str()
 
-        # View Menu - check boxes
-        view_menu = wx.Menu()
-        l_reader = ui_utilities.layout_reader.LayoutReader()
-        filter_options = l_reader.get_filter_options()
-        self._filter_options = dict()
-        for filter_option in filter_options.keys():
-            self._filter_options[filter_option] = view_menu.Append(wx.ID_ANY, filter_option, filter_option, wx.ITEM_CHECK)
-            view_menu.Bind(wx.EVT_MENU, self._toggle_filter_checkbox, self._filter_options[filter_option])
-        #todo Unknown and Other should probably go to logger_configuration.CONFIGURATION
-        self._filter_options["Unknown"] = view_menu.Append(wx.ID_ANY, "Unknown", "Unknown", wx.ITEM_CHECK)
-        view_menu.Bind(wx.EVT_MENU, self._toggle_filter_checkbox, self._filter_options["Unknown"])
-        self._filter_options["Other"] = view_menu.Append(wx.ID_ANY, "Other", "Other", wx.ITEM_CHECK)
-        view_menu.Bind(wx.EVT_MENU, self._toggle_filter_checkbox, self._filter_options["Other"])
-
-        menu_bar.Append(view_menu, '&View')
         self.SetMenuBar(menu_bar)
 
-        # Panel
-        self._panel = wx.Panel(self)
-        self._box_sizer = wx.BoxSizer(wx.VERTICAL)
+        # Root Panel
+        self._root_panel = wx.Panel(self)
+        self._root_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        # Display Panel
+        self._display_sizer = wx.BoxSizer(wx.VERTICAL)
         # Display
+        l_reader = ui_utilities.layout_reader.LayoutReader()
         self._columns = l_reader.get_parts()
         rev_columns = list(self._columns)
         rev_columns.reverse()
-        self._display = wx.ListCtrl(self._panel, size=(-1, 100), style=wx.LC_REPORT | wx.BORDER_SUNKEN)
+        self._display = wx.ListCtrl(self._root_panel, size=(-1, 100), style=wx.LC_REPORT | wx.BORDER_SUNKEN)
         for column in rev_columns:
             self._display.InsertColumn(0, column, width=100)
         self._display.DeleteAllItems()
-        self._box_sizer.Add(self._display, 1, wx.ALL | wx.EXPAND, 8)
-        self._panel.SetSizer(self._box_sizer)
-        self.filtering_changed()
+        self._display_sizer.Add(self._display, 1, wx.ALL | wx.EXPAND, 8)
 
         # User filter field
-        self._text = wx.TextCtrl(self._panel, size=(1, 20), style=wx.TE_MULTILINE | wx.TE_NO_VSCROLL)
-        self._box_sizer.Add(self._text, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+        self._text = wx.TextCtrl(self._root_panel, size=(1, 20), style=wx.TE_MULTILINE | wx.TE_NO_VSCROLL)
+        self._display_sizer.Add(self._text, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
         # Event
         self._text.Bind(wx.EVT_KEY_DOWN, self._on_key_down_text)
         # User filter object
         self._user_filter = ui_utilities.user_filter.UserFilter(self)
         self._user_input_history = ui_utilities.input_history.InputHistory()
+
+        self._root_sizer.Add(self._display_sizer, 1, wx.LEFT | wx.EXPAND, 8)
+
+        # checkbox filters
+        self._filter_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        filter_options = l_reader.get_filter_options()
+        self._filter_options = dict()
+        for filter_option in filter_options.keys():
+            checkbox = wx.CheckBox(self._root_panel, -1, filter_option)
+            self._filter_sizer.Add(checkbox, 1, wx.EXPAND | wx.RIGHT | wx.BOTTOM, 20)
+            checkbox.Bind(wx.EVT_CHECKBOX, self._toggle_filter_checkbox, checkbox)
+            self._filter_options[filter_option] = checkbox
+        #todo Unknown and Other should probably go to logger_configuration.CONFIGURATION
+        checkbox = wx.CheckBox(self._root_panel, -1, "Unknown")
+        self._filter_sizer.Add(checkbox, 1, wx.EXPAND | wx.RIGHT | wx.BOTTOM, 20)
+        checkbox.Bind(wx.EVT_CHECKBOX, self._toggle_filter_checkbox, checkbox)
+        self._filter_options["Unknown"] = checkbox
+        checkbox = wx.CheckBox(self._root_panel, -1, "Other")
+        self._filter_sizer.Add(checkbox, 1, wx.EXPAND | wx.RIGHT | wx.BOTTOM, 20)
+        checkbox.Bind(wx.EVT_CHECKBOX, self._toggle_filter_checkbox, checkbox)
+        self._filter_options["Other"] = checkbox
+
+        self._root_sizer.Add(self._filter_sizer, 0, wx.RIGHT, 8)
+
+        self._root_panel.SetSizer(self._root_sizer)
+
+        self.filtering_changed()
 
         # Frame
         frame_size = logger_configuration.CONFIGURATION['size']
@@ -147,7 +162,7 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
         filter = self._model.get_filter_values()
         for checkbox_name in self._filter_options:
             checkbox = self._filter_options[checkbox_name]
-            checkbox.Check(filter[checkbox.GetText()])
+            checkbox.SetValue(filter[checkbox_name])
         self._status_view = str(self._model)
         self._update_status_bar()
         self._intercept_new_logs()
@@ -248,7 +263,7 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
             filter = self._model.get_filter_values()
             for checkbox_name in self._filter_options:
                 checkbox = self._filter_options[checkbox_name]
-                checkbox.Check(filter[checkbox.GetText()])
+                checkbox.SetValue(filter[checkbox_name])
             self._status_view = str(self._model)
             self._update_status_bar()
             path = dialog.GetPath()
