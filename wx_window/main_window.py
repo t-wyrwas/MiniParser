@@ -15,6 +15,8 @@ import communication.file_read
 import communication.serial_port_reader
 import logger_configuration
 
+import ui_utilities.exceptions
+
 
 
 # TODO define names of modules in one place
@@ -31,6 +33,8 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
 
     def __init__(self, *args, **kwargs):
         super(WxMainWindow, self).__init__(*args, **kwargs)
+
+        ui_utilities.exceptions.Notifier.register_ui(self)
 
         self._model = data.keeper.Keeper(self)
         self._logs_to_display = []
@@ -205,6 +209,10 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
 
     def unmark_item(self, item_index):
         self._display.SetItemBackgroundColour(item_index, self.COLOUR_UNMARK)
+
+    def notify_exception(self, message, terminate):
+        wx.MessageBox(message, 'Exception!', wx.OK | wx.ICON_ERROR)
+        self._on_quit(None)
 
 #todo think of a better way to handle status bar
     def _update_status_bar(self, additional_info=None):

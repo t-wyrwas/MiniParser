@@ -1,4 +1,5 @@
 import logger_configuration
+from ui_utilities.exceptions import Notifier as ExpNotifier
 
 
 class Log:
@@ -10,49 +11,58 @@ class Log:
         parser = logger_configuration.CONFIGURATION["parser"]
         self._parts_of_message = dict()
         unrelated = False
-        signature = parser["logs_signature"]
 
-        if signature["value"] not in message:   #todo take position into consideration
-            unrelated = True
+        try:
+            signature = parser["logs_signature"]
+            if signature["value"] not in message:   #todo take position into consideration
+                unrelated = True
 
-        for part in parser["parts"]:
-            name = part["name"]
-            part_of_message = str()
+            for part in parser["parts"]:
+                name = part["name"]
+                part_of_message = str()
 
-            if unrelated is True:
-                if part.get("for_unrelated", False):
-                    part_of_message = self._text_repr
+                if unrelated is True:
+                    if part.get("for_unrelated", False):
+                        part_of_message = self._text_repr
+                    else:
+                        part_of_message = ''
                 else:
-                    part_of_message = ''
-            else:
-                classifications = part.get("classifications", False)
+                    classifications = part.get("classifications", False)
 
-                if classifications:
-                    part_of_message = "Unknown"
-                    for clssif in classifications:
-                        if clssif["pattern"] in message:
-                            part_of_message = clssif["class"]
-                            break
-                else:
-                    separator = parser["separator"]
-                    start_pos = part.get("start")
-                    end_pos = part.get("end")
-                    msg_splitted = message.split(separator)
-                    if start_pos == end_pos:
-                        part_of_message = msg_splitted[start_pos]
-                    if end_pos < 0:
-                        parts_to_take = msg_splitted[start_pos:len(msg_splitted)]
-                        combined = str()
-                        for p in parts_to_take:
-                            combined += p
-                            combined += separator
-                        part_of_message = combined
-                    #todo check agains unwanted start_pos, end_pos values
+                    if classifications:
+                        part_of_message = "Unknown"
+                        for clssif in classifications:
+                            if clssif["pattern"] in message:
+                                part_of_message = clssif["class"]
+                                break
+                    else:
+                        separator = parser["separator"]
+                        start_pos = part.get("start")
+                        end_pos = part.get("end")
+                        msg_splitted = message.split(separator)
+                        if start_pos == end_pos:
+                            part_of_message = msg_splitted[start_pos]
+                        if end_pos < 0:
+                            parts_to_take = msg_splitted[start_pos:len(msg_splitted)]
+                            combined = str()
+                            for p in parts_to_take:
+                                combined += p
+                                combined += separator
+                            part_of_message = combined
+                        #todo check agains unwanted start_pos, end_pos values
 
-            self._parts_of_message[name] = part_of_message
+                self._parts_of_message[name] = part_of_message
+
+        except KeyError:
+            ExpNotifier.push('Configuration file is corrupted!')
 
     def get_part(self, name):
-        return self._parts_of_message[name]
+        try:
+            part = self._parts_of_message[name]
+        except KeyError:
+            ExpNotifier.push('No specified part of log!')
+        else:
+            return part
 
     def get_whole(self):
         return self._text_repr

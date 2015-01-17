@@ -29,3 +29,6 @@ class BaseWindow:
     def unmark_item(self, item_index):
         pass
 
+    def notify_exception(self, message, terminate):
+        pass
+
