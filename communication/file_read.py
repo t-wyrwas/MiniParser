@@ -1,7 +1,7 @@
 __author__ = 'twyrwas'
 
 
-class DumpFileReader:
+class FileReader:
 
     def __init__(self, container, filename):
         self._container = container

@@ -85,21 +85,6 @@ class Keeper:
                     if log_in_class and class_passes:
                         filtered_logs.append(log)
                         break
-
-        # for log in logs:
-        #     for class_name in self._filter_values:
-        #         class_passes = self._filter_values[class_name]
-        #         log_class_name = log.get_part(self._filtered_part_name)
-        #         log_is_from_class = log_class_name == class_name
-        #         if class_passes and log_is_from_class:
-        #             print 'YES', log.get_whole()
-        #             filtered_logs.append(log)
-        #         else:
-        #             print 'NO', log.get_whole()
-
-        # print 'filtered_logs'
-        # for log in filtered_logs:
-        #     print log.get_whole()
         return filtered_logs
 
 #todo change to standard method to enhance readability

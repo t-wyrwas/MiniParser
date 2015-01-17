@@ -28,11 +28,6 @@ ID_QUICK_SAVE_FILTERED = 8004
 
 #todo make it inherit from general interface to create abstraction layer between wx and the rest of code
 class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
-    """ Serves as the main window for the application with necessary options to control display of parsed dump.
-    >>> app = wx.App()
-    >>> wxp = WxMainWindow(None)
-    >>> app.MainLoop()
-    """
 
     def __init__(self, *args, **kwargs):
         super(WxMainWindow, self).__init__(*args, **kwargs)
@@ -41,7 +36,7 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
         self._logs_to_display = []
         self._prev_log = str()
         self._index = 0
-        self._reader = communication.file_read.DumpFileReader(self._model, '')    #todo refactor
+        self._reader = communication.file_read.FileReader(self._model, '')    #todo refactor
         self._serial_port_reader = communication.serial_port_reader.SerialPortReader(self._model) # wtf?
 
         self.COLOUR_MARK = wx.Colour(200, 200, 250)
@@ -235,8 +230,6 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
         self._reset()
 
     def _on_read(self, e):
-        print '_on_read'
-        # self._serial_port_reader.stop()
         self._reader.stop()
         dialog = wx.FileDialog(self, 'Open', '', r'C:\\', 'All (*)|*', wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         result = dialog.ShowModal()
@@ -253,17 +246,14 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
             path = dialog.GetPath()
             self._set_title(path)
             dialog.Destroy()
-            self._reader = communication.file_read.DumpFileReader(self.get_model(), path)
+            self._reader = communication.file_read.FileReader(self.get_model(), path)
             reader_thread = threading.Thread(target=self._reader.run)
             reader_thread.start()
 
     def _on_read_ser_port(self, e):
-        print '_on_read_ser_port'
         self._serial_port_reader.stop()
         self._reader.stop()
-        print '_on_read_ser_port: new serial reader'
         reader_thread = threading.Thread(target=self._serial_port_reader.run)
-        print '_on_read_ser_port: starting thread'
         reader_thread.start()
         self._set_title(self._INFO_LABELS['SERIAL_PORT_READ'])
 
@@ -337,5 +327,4 @@ class WxMainWindow (ui_utilities.base_window.BaseWindow, wx.Frame):
                 new_filtering[checkbox_name] = True
             else:
                 new_filtering[checkbox_name] = False
-        print 'DEBUG new filtering ', new_filtering
         self._model.update_filter(new_filtering)

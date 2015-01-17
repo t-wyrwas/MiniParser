@@ -18,7 +18,6 @@ class SerialPortReader:
         }
 
     def run(self):
-        print 'SerialPortReader run'
         try:
             self._serial = serial.Serial(**self._config_data)
             if self._serial.isOpen():
@@ -37,11 +36,9 @@ class SerialPortReader:
                 log = self._serial.readline()
                 if log is not '':
                     self._container.append(log)
-            print 'SerialPort Reader run while break'
 
     def stop(self):
         if self._run is True:
-            print 'SerialPortReader stopping'
             self._run = False
             self._serial.flushInput()
             self._serial.close()
